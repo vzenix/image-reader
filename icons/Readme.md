@@ -1,0 +1,1 @@
+# Icons of plugins
