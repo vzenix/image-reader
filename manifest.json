@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Image reader",
-    "version": "1.0",
+    "version": "1.0.1",
     "description": "Show all images from the webpage easly",
     "author": "VZenix <info@vzenix.es>",
     "permissions": [
