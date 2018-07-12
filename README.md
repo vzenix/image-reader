@@ -5,8 +5,8 @@ Plugin for Firefox and Chrome for view all images of a loaded page
 
 # Installers
 
-Install in firefox: https://addons.mozilla.org/es/firefox/addon/image-reader/
-Install in chrome: ....
+* Install in firefox: https://addons.mozilla.org/es/firefox/addon/image-reader/
+* Install in chrome: Add it manually
 
 # How to
 
