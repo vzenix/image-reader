@@ -55,7 +55,7 @@
             return;
         }
 
-        let styleBtns = 'background: white; border: none; cursor: pointer;';
+        let styleBtns = 'background: white; border: none; cursor: pointer; color: black; font-size: 11px; margin: 0; padding: 0;';
         let shadow = '-webkit-box-shadow: 0px 10px 10px -11px rgba(0,0,0,0.75); -moz-box-shadow: 0px 10px 10px -11px rgba(0,0,0,0.75); box-shadow: 0px 10px 10px -11px rgba(0,0,0,0.75);';
         let htmlViewer = '\
     <div style="width: 100vw; height: 100vh; position: fixed; background: black; opacity: 0.8; z-index: 9000; top: 0px; left: 0px;" id="imageReaderBGID"></div>\
