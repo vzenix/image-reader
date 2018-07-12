@@ -1,0 +1,40 @@
+{
+    "manifest_version": 2,
+    "name": "Image reader",
+    "version": "1.0",
+    "description": "Show all images from the webpage easly",
+    "author": "VZenix <info@vzenix.es>",
+    "permissions": [
+        "activeTab",
+        "contextMenus"
+    ],
+    "icons": {
+        "32": "icons/logo-32.png",
+        "48": "icons/logo-48.png",
+        "64": "icons/logo-64.png",
+        "128": "icons/logo-128.png",
+        "256": "icons/logo-256.png"
+    },
+    "browser_action": {
+        "default_icon": {
+            "32": "icons/logo-32.png",
+            "48": "icons/logo-48.png",
+            "64": "icons/logo-64.png",
+            "128": "icons/logo-128.png",
+            "256": "icons/logo-256.png"
+        }
+    },
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "content_scripts": [{
+        "all_frames": true,
+        "match_about_blank": true,
+        "matches": [
+            "http://*/*",
+            "https://*/*"
+        ],
+        "run_at": "document_idle",
+        "js": ["index.js"]
+    }]
+}
