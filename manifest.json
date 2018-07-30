@@ -1,12 +1,13 @@
 {
     "manifest_version": 2,
     "name": "Image reader",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Show all images from the webpage easly",
     "author": "VZenix <info@vzenix.es>",
     "permissions": [
         "activeTab",
-        "contextMenus"
+        "contextMenus",
+        "storage"
     ],
     "icons": {
         "32": "icons/logo-32.png",
@@ -36,5 +37,9 @@
         ],
         "run_at": "document_idle",
         "js": ["index.js"]
-    }]
+    }],
+    "options_ui": {
+        "page": "config/home.html",
+        "open_in_tab": true
+    }
 }
