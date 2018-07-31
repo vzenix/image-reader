@@ -33,9 +33,25 @@
 
             <div class="configuration margin-section">
                 <form>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label>Color</label>
                         <input type="text" id="color" class="form-control" placeholder="Color" />
+                    </div>
+                    <div class="form-group">
+                        <label>Minimum width to show</label>
+                        <input type="number" id="minWidthShow" class="form-control" placeholder="Minimum width to show" />
+                    </div>
+                    <div class="form-group">
+                        <label>Minimum height to show</label>
+                        <input type="number" id="minHeightShow" class="form-control" placeholder="Minimum height to show" />
+                    </div>
+                    <div class="form-group">
+                        <label>Default order</label>
+                        <input type="text" id="orderDefault" class="form-control" placeholder="Default order" />
+                    </div>
+                    <div class="form-group">
+                        <label>Default order direction</label>
+                        <input type="text" id="orderDefaultDirection" class="form-control" placeholder="Default order direction" />
                     </div>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </form>
