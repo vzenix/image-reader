@@ -16,8 +16,15 @@ function openViewer() {
     }
 }
 
+/* minWidthShow minHeightShow orderDefault orderDefaultDirection */
 function loadSettings() {
-    var getting = browser.storage.local.get("color");
+    var getting;
+    if (typeof chrome !== typeof undefined && typeof chrome.browserAction !== typeof undefined) {
+        getting = chrome.storage.local.get("minWidthShow", "minHeightShow", "orderDefault", "orderDefaultDirection");
+    } else if (typeof browser !== typeof undefined && typeof browser.browserAction !== typeof undefined) {
+        getting = browser.storage.local.get("minWidthShow", "minHeightShow", "orderDefault", "orderDefaultDirection");
+    }
+
     getting.then(onGot, onError);
 
     function onError(error) {
@@ -25,11 +32,10 @@ function loadSettings() {
     }
 
     function onGot(item) {
-        var color = "blue";
-        if (item.color) {
-            color = item.color;
+        var minWidthShow = 32;
+        if (item.minWidthShow) {
+            minWidthShow = item.minWidthShow;
         }
-        document.body.style.border = "10px solid " + color;
     }
 }
 
