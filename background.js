@@ -1,7 +1,7 @@
 function openViewer() {
     if (typeof chrome !== typeof undefined && typeof chrome.tabs !== typeof undefined) {
         chrome.tabs.executeScript({
-            code: `window.openImageReaderViewer()`
+            code: `document.__vz.imageReader.openImageReaderViewer()`
         });
 
         return;
@@ -9,7 +9,7 @@ function openViewer() {
 
     if (typeof browser !== typeof undefined && typeof browser.tabs !== typeof undefined) {
         browser.tabs.executeScript({
-            code: `window.openImageReaderViewer()`
+            code: `document.__vz.imageReader.openImageReaderViewer()`
         });
 
         return;
