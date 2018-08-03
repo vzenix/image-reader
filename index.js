@@ -1,15 +1,21 @@
 (function () {
+
+    // Init space form vars into webpage
+    if (typeof document.__vz === typeof undefined) {
+        document.__vz = {};
+    }
+
+    if (typeof document.__vz.imageReader === typeof undefined) {
+        document.__vz.imageReader = {};
+    }
+    
     // Constants
     var imageReaderCurrentImage = 0;
     var images = new Array();
-    window.openImageReaderViewer = function () {
-        if (document.getElementById('imageReaderBGID')) {
-            removeUI();
-            return;
-        }
 
-        prepareViewer();
-    };
+    // Functions
+    document.__vz.imageReader.openImageReaderViewer = openImageReaderViewer;
+    document.__vz.imageReader.setConfigImageReader = setConfigImageReader;
 
     // Script
     prepareUI();
@@ -151,6 +157,19 @@
         if (evt.keyCode === 39) {
             rightImage();
         }
+    }
+    
+    function openImageReaderViewer() {
+        if (document.getElementById('imageReaderBGID')) {
+            removeUI();
+            return;
+        }
+
+        prepareViewer();
+    };
+
+    function setConfigImageReader(cnf) {
+        document.__vz.imageReader.cnf = cnf;
     }
 
 }());
