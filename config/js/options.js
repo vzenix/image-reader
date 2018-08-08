@@ -1,5 +1,8 @@
 /* minWidthShow minHeightShow orderDefault orderDefaultDirection */
 
+var DIRECTION_HEIGHT = "A01";
+var DIRECTION_WIDTH = "A02";
+
 function saveOptions(e) {
     e.preventDefault();
     browser.storage.local.set({

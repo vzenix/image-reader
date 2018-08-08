@@ -1,5 +1,8 @@
 (function () {
 
+    var DIRECTION_HEIGHT = "A01";
+    var DIRECTION_WIDTH = "A02";
+
     // Init space form vars into webpage
     if (typeof document.__vz === typeof undefined) {
         document.__vz = {};
@@ -8,7 +11,7 @@
     if (typeof document.__vz.imageReader === typeof undefined) {
         document.__vz.imageReader = {};
     }
-    
+
     // Constants
     var imageReaderCurrentImage = 0;
     var images = new Array();
@@ -18,11 +21,44 @@
     document.__vz.imageReader.setConfigImageReader = setConfigImageReader;
 
     // Script
-    prepareUI();
+    document.__vz.imageReader.setConfigImageReader({
+        minWidthShow: 32,
+        minHeightShow: 32,
+        orderDefault: "DESC",
+        orderDefaultDirection: "A01"
+    });
+    prepare();
 
     // Methods
-    function prepareUI() {
+    function prepare() {
+        // On Message
+        if (typeof browser !== typeof undefined && typeof browser.runtime != typeof undefined && browser.runtime.onMessage !== typeof undefined) {
+            browser.runtime.onMessage.addListener(onMessageListener);
+        } else if (typeof chrome !== typeof undefined && typeof chrome.runtime != typeof undefined && chrome.runtime.onMessage !== typeof undefined) {
+            chrome.runtime.onMessage.addListener(onMessageListener);
+        }
+
         document.addEventListener('keyup', keyupEvents, false);
+    }
+
+    function onMessageListener(request) {
+
+        document.__vz.imageReader.setConfigImageReader(request.options);
+
+        switch (request.action) {
+            case "show":
+                document.__vz.imageReader.openImageReaderViewer();
+                break;
+
+            case "hide":
+                removeUI();
+                break;
+        }
+
+
+        return Promise.resolve({
+            response: "Hi from content script"
+        });
     }
 
     function getAllImages() {
@@ -37,7 +73,7 @@
                     src: imgs[i].src
                 };
 
-                if (toPush.height >= 32 && toPush.width >= 32) {
+                if (toPush.height >= document.__vz.imageReader.cnf.minHeightShow && toPush.width >= document.__vz.imageReader.cnf.minWidthShow) {
                     src.push(toPush);
                 }
 
@@ -158,7 +194,7 @@
             rightImage();
         }
     }
-    
+
     function openImageReaderViewer() {
         if (document.getElementById('imageReaderBGID')) {
             removeUI();
@@ -170,6 +206,7 @@
 
     function setConfigImageReader(cnf) {
         document.__vz.imageReader.cnf = cnf;
+        console.log(document.__vz.imageReader.cnf);
     }
 
 }());
