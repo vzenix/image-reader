@@ -29,7 +29,7 @@
         "scripts": ["background.js"]
     },
     "content_scripts": [{
-        "all_frames": true,
+        "all_frames": false,
         "match_about_blank": true,
         "matches": [
             "http://*/*",
