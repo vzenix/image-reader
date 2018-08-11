@@ -12,6 +12,6 @@ Plugin for Firefox and Chrome for view all images of a loaded page
 
 Only press the top icon in your browser and the image viewer will be open.
 
-You can control it with the button or can user your keyborard (directional keys)
+You can control it with the button or can use your keyborard (directional keys)
 
 Press "ESC" to close.
