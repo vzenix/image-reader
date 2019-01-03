@@ -14,6 +14,7 @@
 
     // Constants
     document.__vz.imageReader.currentImage = 0;
+    document.__vz.imageReader.loadingPage = true;
     document.__vz.imageReader.images = new Array();
 
     // Functions
@@ -43,6 +44,12 @@
         }
 
         document.addEventListener('keyup', keyupEvents, false);
+        window.addEventListener("load", function (evt) {
+            document.__vz.imageReader.loadingPage = false;
+            reloadImages();
+            goToImage(document.__vz.imageReader.currentImage);
+            showLoading();
+        });
     }
 
     function onMessageListener(request) {
@@ -92,6 +99,7 @@
             }
         }
 
+        showLoading();
         return src;
     }
 
@@ -123,8 +131,6 @@
             return;
         }
 
-        console.log("Images: ", document.__vz.imageReader.images);
-
         let htmlViewer = '\
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" /> \
     <div style="width: 100vw; height: 100vh; position: fixed; background: black; opacity: 0.8; z-index: 9000; top: 0px; left: 0px;" id="imageReaderBGID"></div>\
@@ -137,36 +143,39 @@
 
         let htmlButtons = '\
         <div class="vz-button-container">\
-            <button id="imageReaderContainerBtnPrevID" class="vz-button">\
-            <i class="material-icons"> arrow_back_ios </i> \
-            </button>\
             <span class="vz-button-separator"></span>\
-            <button id="imageReaderContainerBtnNextID" class="vz-button">\
-                <i class="material-icons"> arrow_forward_ios </i>\
-            </button>\
-        </div>\
+            <button id="imageReaderContainerBtnCloseID" class="vz-button">\
+                <i class="material-icons"> close </i> \
+            </button> \
+        </div> \
         <div class="vz-bottom-container"> \
+            <span class="vz-loading-info vz-button-secundary" style="padding-right: 10px;"> <i class="material-icons vz-animate-loading"> refresh </i> </span> \
+            <span class="vz-loading-info">Loading images</span> \
             <span id="imageReaderContainerCountID"> 1 / ' + document.__vz.imageReader.images.length + ' </span> \
             <span class="vz-button-separator"></span> \
+            <button id="imageReaderContainerBtnPrevID" class="vz-button-secundary" style="margin-right: 0;">\
+                <i class="material-icons"> arrow_back_ios </i> \
+            </button> \
             <button id="imageReaderContainerBtnMoreID" class="vz-button-secundary">\
                 <i class="material-icons"> apps </i> \
             </button> \
-            <button id="imageReaderContainerBtnCloseID" class="vz-button-secundary">\
-                <i class="material-icons"> close </i> \
+            <button id="imageReaderContainerBtnNextID" class="vz-button-secundary" style="margin-right: 25px;">\
+                <i class="material-icons"> arrow_forward_ios </i> \
             </button> \
         </div>\
         <style type="text/css">\
             /* Top */ \
             div.vz-button-container { \
+                margin: 0; \
+                padding: 0; \
                 background: none; \
                 position: fixed; \
                 z-index: 9003; \
-                max-width: 90vw; \
+                max-width: 100vw; \
                 width: 100vw; \
-                margin-left: 5vw; \
                 height: 50px; \
-                top: 15px; \
-                left: 0; \
+                top: 0px; \
+                right: 0; \
                 text-align: center; \
                 border-radius: 0 0 2px 2px; \
                 background-color: transparent; \
@@ -174,7 +183,7 @@
             } \
             button.vz-button {\
                 background: none; \
-                background-color: transparent; \
+                background-color: black; \
                 font-weight: normal; \
                 border: 0; \
                 cursor: pointer; \
@@ -186,9 +195,9 @@
                 width: 50px; \
                 height: 50px; \
                 font-family: Arial,Helvetica Neue,Helvetica,sans-serif; \
-                font-size: 12px; \
-                border-radius: 50%; \
+                font-size: 18px; \
             } \
+            button.vz-button .material-icons { font-size: 48px; } \
             /* Bottom */ \
             \
             div.vz-bottom-container { \
@@ -233,6 +242,10 @@
             } \
             #imageReaderContainerCountID { padding: 0 15px 0 25px; } \
             #imageReaderContainerCurrentImage { max-width: 95vw; max-height: 95vh; } \
+            .vz-animate-loading { -webkit-animation:spin 2s linear infinite; -moz-animation:spin 2s linear infinite; animation:spin 2s linear infinite; } \
+            @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } } \
+            @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } } \
+            @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } } \
         </style>';
 
         let mainContainer = document.createElement("DIV");
@@ -240,6 +253,7 @@
         mainContainer.setAttribute("id", "imageReaderMainContainerID");
         mainContainer.innerHTML = htmlButtons + htmlViewer;
         document.body.appendChild(mainContainer);
+        showLoading();
 
         document.__vz.imageReader.currentImage = 0;
         document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
@@ -269,14 +283,34 @@
         document.getElementById('imageReaderContainerBtnPrevID').remove();
         document.getElementById('imageReaderContainerID').remove();
         document.getElementById('imageReaderMainContainerID').remove();
+
+        removeBrowserUI();
+    }
+
+    function removeBrowserUI() {
+        if (document.getElementById('imageReaderBrowserContainerID')) {
+            document.getElementById('imageReaderBrowserContainerID').remove();
+        }
     }
 
     function rightImage() {
+        goToImage(document.__vz.imageReader.currentImage + 1);
+    };
+
+    function leftImage() {
+        goToImage(document.__vz.imageReader.currentImage - 1);
+    };
+
+    function goToImage(index) {
         if (!document.getElementById('imageReaderBGID')) {
             return;
         }
 
-        document.__vz.imageReader.currentImage++;
+        document.__vz.imageReader.currentImage = index;
+        if (document.__vz.imageReader.currentImage < 0) {
+            document.__vz.imageReader.currentImage = document.__vz.imageReader.images.length - 1;
+        }
+
         if (document.__vz.imageReader.currentImage >= document.__vz.imageReader.images.length) {
             document.__vz.imageReader.currentImage = 0;
         }
@@ -288,27 +322,7 @@
         if (document.getElementById('imageReaderContainerCountID')) {
             document.getElementById('imageReaderContainerCountID').innerHTML = (document.__vz.imageReader.currentImage + 1) + ' / ' + document.__vz.imageReader.images.length;
         }
-    };
-
-    function leftImage() {
-        if (!document.getElementById('imageReaderBGID')) {
-            return;
-        }
-
-        document.__vz.imageReader.currentImage--;
-        if (document.__vz.imageReader.currentImage < 0) {
-            document.__vz.imageReader.currentImage = document.__vz.imageReader.images.length - 1;
-        }
-
-        document.getElementById('imageReaderContainerCurrentImage').remove();
-        document.getElementById('imageReaderContainerCurrentImageContainer').innerHTML = '<img id="imageReaderContainerCurrentImage" />';
-        document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
-        // document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
-
-        if (document.getElementById('imageReaderContainerCountID')) {
-            document.getElementById('imageReaderContainerCountID').innerHTML = (document.__vz.imageReader.currentImage + 1) + ' / ' + document.__vz.imageReader.images.length;
-        }
-    };
+    }
 
     function keyupEvents(evt) {
         evt = evt || window.event;
@@ -380,7 +394,78 @@
 
 
     function moreImages() {
-        alert("Dev. in progess");
+
+        if (document.getElementById('imageReaderBrowserContainerID')) {
+            return;
+        }
+
+        let image = '';
+        for (let i = 0; i < document.__vz.imageReader.images.length; i++) {
+            image += '\
+            <div class="vz-main-browser-container" data-count="' + i + '"> \
+                <img src="' + document.__vz.imageReader.images[i].src + '" class="vz-main-browser-container-image" id="vzMainBrowserContainerImage' + i + '" />\
+            </div>';
+        }
+
+        let imageBrowser = ' \
+        <div class="vz-main-browser"> \
+             ' + image + ' \
+        </div>\
+        <style type="text/css">\
+            div.vz-main-browser { \
+                margin: 0; padding: 0; \
+                top: 0; \
+                position:fixed; \
+                max-width: 100vw; \
+                max-height: 100vh; \
+                overflow-y: auto; \
+                z-index: 99999; \
+                width: 100vw; \
+                height: 100vh; \
+                background-color: #000D; \
+                display: grid; \
+                grid-template-columns: repeat(5, 1fr); \
+                grid-gap: 10px; \
+                grid-auto-rows: minmax(100px, 100px); \
+                margin-left: 0; margin-top: 0; left: 0; \
+            } \
+            div.vz-main-browser-container { \
+                text-align: center; /* max-width: 50px; max-height: 50px; float: left; */ \
+            } \
+            img.vz-main-browser-container-image { \
+                max-width: 100%; max-height: 100%; cursor: pointer; \
+            } \
+            html, body { overflow: hidden; } \
+            @media only screen and (max-width: 800px) { div.vz-main-browser { grid-template-columns: repeat(3, 1fr); } }\
+            @media only screen and (max-width: 600px) { div.vz-main-browser { grid-template-columns: repeat(2, 1fr); } }\
+            @media only screen and (max-width: 300px) { div.vz-main-browser { grid-template-columns: repeat(1, 1fr); } }\
+        </style>';
+
+        let browserContainer = document.createElement("DIV");
+        browserContainer.setAttribute("style", "");
+        browserContainer.setAttribute("id", "imageReaderBrowserContainerID");
+        browserContainer.innerHTML = imageBrowser;
+        document.body.appendChild(browserContainer);
+
+        for (let i = 0; i < document.__vz.imageReader.images.length; i++) {
+            let el = document.getElementById('vzMainBrowserContainerImage' + i);
+            if (el) {
+                el.addEventListener('click', function () {
+                    goToImage(i);
+                    removeBrowserUI();
+                });
+            }
+        }
+
+    }
+
+    function showLoading() {
+        if (!document.__vz.imageReader.loadingPage) {
+            let elements = document.getElementsByClassName('vz-loading-info');
+            for (let i = elements.length - 1; i >= 0 ; i--) {
+                elements[i].remove();
+            }
+        }
     }
 
 }());
