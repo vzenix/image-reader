@@ -72,8 +72,24 @@ function onError(error) {
 
 if (typeof browser !== typeof undefined && typeof browser.browserAction !== typeof undefined) {
     browser.browserAction.onClicked.addListener(load);
+
+    browser.contextMenus.create({
+        id: "vz-view-gallery",
+        title: 'Image reader',
+        contexts: ["all"],
+        onclick: load
+    });
+
 } else if (typeof chrome !== typeof undefined && typeof chrome.browserAction !== typeof undefined) {
     chrome.browserAction.onClicked.addListener(load);
+
+    chrome.contextMenus.create({
+        id: "vz-view-gallery",
+        title: 'Image reader',
+        contexts: ["all"],
+        onclick: load
+    });
+
 } else {
     onError("Can't load 'chrome.browserAction.onClicked' or 'browser.browserAction.onClicked'");
 }

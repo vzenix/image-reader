@@ -44,12 +44,19 @@
         }
 
         document.addEventListener('keyup', keyupEvents, false);
-        window.addEventListener("load", function (evt) {
-            document.__vz.imageReader.loadingPage = false;
-            reloadImages();
-            goToImage(document.__vz.imageReader.currentImage);
-            showLoading();
-        });
+        window.addEventListener("load", reloadOnFinishLoad);
+        document.body.addEventListener("load", reloadOnFinishLoad);
+    }
+
+    function reloadOnFinishLoad() {
+        if (!document.__vz.imageReader.loadingPage) {
+            return;
+        }
+
+        document.__vz.imageReader.loadingPage = false;
+        reloadImages();
+        goToImage(document.__vz.imageReader.currentImage);
+        showLoading();
     }
 
     function onMessageListener(request) {
@@ -170,12 +177,12 @@
                 padding: 0; \
                 background: none; \
                 position: fixed; \
-                z-index: 9003; \
+                z-index: 999999; \
                 max-width: 100vw; \
                 width: 100vw; \
                 height: 50px; \
                 top: 0px; \
-                right: 0; \
+                right: 18px; \
                 text-align: center; \
                 border-radius: 0 0 2px 2px; \
                 background-color: transparent; \
@@ -460,9 +467,18 @@
     }
 
     function showLoading() {
+        if (document.readyState === 'complete') {
+            let elements = document.getElementsByClassName('vz-loading-info');
+            for (let i = elements.length - 1; i >= 0; i--) {
+                elements[i].remove();
+            }
+
+            return;
+        }
+
         if (!document.__vz.imageReader.loadingPage) {
             let elements = document.getElementsByClassName('vz-loading-info');
-            for (let i = elements.length - 1; i >= 0 ; i--) {
+            for (let i = elements.length - 1; i >= 0; i--) {
                 elements[i].remove();
             }
         }
