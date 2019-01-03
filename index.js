@@ -123,34 +123,117 @@
             return;
         }
 
-        let styleBtns = 'font-weight: normal; background: white; border: 1px solid #EEE; box-shadow: 1px 0px 8px 0px #C6C6C6; border-radius: 2px; cursor: pointer; color: black; margin: 0; padding: 0; line-height: 1; display: inline-block; width: 50px; height: 25px; font-family: Arial,Helvetica Neue,Helvetica,sans-serif; font-size: 12px;';
-        let shadow = '-webkit-box-shadow: 0px 10px 10px -11px rgba(0,0,0,0.75); -moz-box-shadow: 0px 10px 10px -11px rgba(0,0,0,0.75); box-shadow: 0px 10px 10px -11px rgba(0,0,0,0.75);';
+        console.log("Images: ", document.__vz.imageReader.images);
+
         let htmlViewer = '\
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" /> \
     <div style="width: 100vw; height: 100vh; position: fixed; background: black; opacity: 0.8; z-index: 9000; top: 0px; left: 0px;" id="imageReaderBGID"></div>\
     <div style="width: 100vw; height: 100vh; position: fixed; z-index: 9001; top: 0px; left: 0px; display: table;" id="imageReaderContainerID">\
-        <div style="display: table-cell; vertical-align: middle; text-align: center;">\
-            <img id="currentImage" style="max-width: 95vw; max-height: 95vh;" />\
+        <div style="display: table-cell; vertical-align: middle; text-align: center;" id="imageReaderContainerCurrentImageContainer">\
+            <img id="imageReaderContainerCurrentImage" />\
         </div>\
-    </div>\
+    </div> \
     ';
 
         let htmlButtons = '\
-        <div style="padding-top: 5px; position: fixed; z-index: 9003; width: 250px; height: 32px; top: 0; left: 50%; background-color: white; text-align: center; margin-left: -125px; border-radius: 0 0 2px 2px;' + shadow + '">\
-            <button style="' + styleBtns + '" id="imageReaderContainerBtnPrevID">\
-                Back\
+        <div class="vz-button-container">\
+            <button id="imageReaderContainerBtnPrevID" class="vz-button">\
+            <i class="material-icons"> arrow_back_ios </i> \
             </button>\
-            &nbsp;&nbsp;&nbsp;&nbsp;\
-            <button style="' + styleBtns + '" id="imageReaderContainerBtnCloseID">\
-                Close\
-            </button>\
-            &nbsp;&nbsp;&nbsp;&nbsp;\
-            <button style="' + styleBtns + '" id="imageReaderContainerBtnNextID">\
-                Next\
+            <span class="vz-button-separator"></span>\
+            <button id="imageReaderContainerBtnNextID" class="vz-button">\
+                <i class="material-icons"> arrow_forward_ios </i>\
             </button>\
         </div>\
-        <div style="padding-top: 10px; padding-bottom: 5px; color: black; font-weight: bold; position: fixed; z-index: 9002; width: 250px; bottom: 0; left: 100%; background-color: white; text-align: center; margin-left: -250px; font-family: Arial,Helvetica Neue,Helvetica,sans-serif; font-size: 12px;">\
-            ' + document.__vz.imageReader.images.length + ' images detected\
-        </div>';
+        <div class="vz-bottom-container"> \
+            <span id="imageReaderContainerCountID"> 1 / ' + document.__vz.imageReader.images.length + ' </span> \
+            <span class="vz-button-separator"></span> \
+            <button id="imageReaderContainerBtnMoreID" class="vz-button-secundary">\
+                <i class="material-icons"> apps </i> \
+            </button> \
+            <button id="imageReaderContainerBtnCloseID" class="vz-button-secundary">\
+                <i class="material-icons"> close </i> \
+            </button> \
+        </div>\
+        <style type="text/css">\
+            /* Top */ \
+            div.vz-button-container { \
+                background: none; \
+                position: fixed; \
+                z-index: 9003; \
+                max-width: 90vw; \
+                width: 100vw; \
+                margin-left: 5vw; \
+                height: 50px; \
+                top: 15px; \
+                left: 0; \
+                text-align: center; \
+                border-radius: 0 0 2px 2px; \
+                background-color: transparent; \
+                display: flex; \
+            } \
+            button.vz-button {\
+                background: none; \
+                background-color: transparent; \
+                font-weight: normal; \
+                border: 0; \
+                cursor: pointer; \
+                color: white; \
+                margin: 0; \
+                padding: 0; \
+                line-height: 1; \
+                display: inline-block; \
+                width: 50px; \
+                height: 50px; \
+                font-family: Arial,Helvetica Neue,Helvetica,sans-serif; \
+                font-size: 12px; \
+                border-radius: 50%; \
+            } \
+            /* Bottom */ \
+            \
+            div.vz-bottom-container { \
+                padding-top: 10px; \
+                padding-bottom: 5px; \
+                color: white; \
+                font-weight: bold; \
+                position: fixed; \
+                z-index: 9999999999999; \
+                bottom: 0; \
+                right: 0; \
+                background-color: #000; \
+                text-align: center; \
+                margin-left: -250px; \
+                font-family: Arial,Helvetica Neue,Helvetica,sans-serif; \
+                font-size: 12px; \
+                display: flex; \
+                align-items: center; \
+                padding-left: 5px; \
+            } \
+            button.vz-button-secundary {\
+                background: none; \
+                background-color: transparent; \
+                font-weight: normal; \
+                border: 0; \
+                cursor: pointer; \
+                color: white; \
+                margin: 0; \
+                padding: 0; \
+                line-height: 1; \
+                display: inline-block; \
+                width: 38px; \
+                height: 38px; \
+                font-family: Arial,Helvetica Neue,Helvetica,sans-serif; \
+                font-size: 10px; \
+                border-radius: 50%; \
+                margin-right: 10px; \
+            } \
+            /* Separator */ \
+            span.vz-button-separator { \
+                flex: 1; \
+            } \
+            #imageReaderContainerCountID { padding: 0 15px 0 25px; } \
+            #imageReaderContainerCurrentImage { max-width: 95vw; max-height: 95vh; } \
+        </style>';
 
         let mainContainer = document.createElement("DIV");
         mainContainer.setAttribute("style", "");
@@ -159,17 +242,26 @@
         document.body.appendChild(mainContainer);
 
         document.__vz.imageReader.currentImage = 0;
-        document.getElementById('currentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
+        document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
 
         document.getElementById('imageReaderBGID').addEventListener('click', removeUI);
         document.getElementById('imageReaderContainerBtnPrevID').addEventListener('click', leftImage);
         document.getElementById('imageReaderContainerBtnNextID').addEventListener('click', rightImage);
         document.getElementById('imageReaderContainerBtnCloseID').addEventListener('click', removeUI);
+        document.getElementById('imageReaderContainerBtnMoreID').addEventListener('click', moreImages);
     }
 
     function removeUI() {
         if (!document.getElementById('imageReaderBGID')) {
             return;
+        }
+
+        if (document.getElementById('imageReaderContainerBtnCloseID')) {
+            document.getElementById('imageReaderContainerBtnCloseID').remove();
+        }
+
+        if (document.getElementById('imageReaderContainerBtnMoreID')) {
+            document.getElementById('imageReaderContainerBtnMoreID').remove();
         }
 
         document.getElementById('imageReaderBGID').remove();
@@ -189,7 +281,13 @@
             document.__vz.imageReader.currentImage = 0;
         }
 
-        document.getElementById('currentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
+        document.getElementById('imageReaderContainerCurrentImage').remove();
+        document.getElementById('imageReaderContainerCurrentImageContainer').innerHTML = '<img id="imageReaderContainerCurrentImage" />';
+        document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
+
+        if (document.getElementById('imageReaderContainerCountID')) {
+            document.getElementById('imageReaderContainerCountID').innerHTML = (document.__vz.imageReader.currentImage + 1) + ' / ' + document.__vz.imageReader.images.length;
+        }
     };
 
     function leftImage() {
@@ -202,7 +300,14 @@
             document.__vz.imageReader.currentImage = document.__vz.imageReader.images.length - 1;
         }
 
-        document.getElementById('currentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
+        document.getElementById('imageReaderContainerCurrentImage').remove();
+        document.getElementById('imageReaderContainerCurrentImageContainer').innerHTML = '<img id="imageReaderContainerCurrentImage" />';
+        document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
+        // document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
+
+        if (document.getElementById('imageReaderContainerCountID')) {
+            document.getElementById('imageReaderContainerCountID').innerHTML = (document.__vz.imageReader.currentImage + 1) + ' / ' + document.__vz.imageReader.images.length;
+        }
     };
 
     function keyupEvents(evt) {
@@ -271,6 +376,11 @@
         }
 
         return null;
+    }
+
+
+    function moreImages() {
+        alert("Dev. in progess");
     }
 
 }());
