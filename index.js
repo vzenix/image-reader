@@ -1,7 +1,12 @@
 (function () {
 
-    // let DIRECTION_HEIGHT = "A01";
-    // let DIRECTION_WIDTH = "A02";
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  Globals and initializations
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
 
     // Init space form vars into webpage
     if (typeof document.__vz === typeof undefined) {
@@ -16,6 +21,8 @@
     document.__vz.imageReader.currentImage = 0;
     document.__vz.imageReader.loadingPage = true;
     document.__vz.imageReader.images = new Array();
+    document.__vz.imageReader.checkAutoOpen = false;
+    document.__vz.imageReader.configLoaded = false;
 
     // Functions
     document.__vz.imageReader.openImageReaderViewer = openImageReaderViewer;
@@ -27,11 +34,14 @@
         minWidthShow: 32,
         minHeightShow: 32,
         orderDefault: "DESC",
-        orderDefaultDirection: "A01"
+        orderDefaultDirection: "A01",
+        openAuto: ""
     });
+
+    // Init events and callbacks
     prepare();
 
-    // Methods
+    // Prepare
     function prepare() {
         // On Message
         if (typeof browser !== typeof undefined && typeof browser.runtime != typeof undefined && browser.runtime.onMessage !== typeof undefined) {
@@ -48,6 +58,15 @@
         document.body.addEventListener("load", reloadOnFinishLoad);
     }
 
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  A little functionallity
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
+
+    // Call when event listener load finish
     function reloadOnFinishLoad() {
         if (!document.__vz.imageReader.loadingPage) {
             return;
@@ -56,29 +75,10 @@
         document.__vz.imageReader.loadingPage = false;
         reloadImages();
         goToImage(document.__vz.imageReader.currentImage);
-        showLoading();
+        checkLoading();
     }
 
-    function onMessageListener(request) {
-
-        document.__vz.imageReader.setConfigImageReader(request.options);
-
-        switch (request.action) {
-            case "hide":
-                document.__vz.imageReader.hideImageReaderViewer();
-                break;
-
-            default:
-            case "show":
-                document.__vz.imageReader.openImageReaderViewer();
-                break;
-        }
-
-        return Promise.resolve({
-            response: "Hi"
-        });
-    }
-
+    // Read images from current webpage
     function getAllImages() {
         let imgs = document.querySelectorAll('img');
         let src = new Array();
@@ -106,10 +106,11 @@
             }
         }
 
-        showLoading();
+        checkLoading();
         return src;
     }
 
+    // Read images from current webpage and order its
     function reloadImages() {
         let order = getConfig("orderDefault");
         let direction = getConfig("orderDefaultDirection");
@@ -129,19 +130,75 @@
         });
     }
 
+    // Movement in Image browser view
+    function rightImage() {
+        goToImage(document.__vz.imageReader.currentImage + 1);
+    };
+
+    // Movement in Image browser view
+    function leftImage() {
+        goToImage(document.__vz.imageReader.currentImage - 1);
+    };
+
+    // Movement in Image browser view
+    function goToImage(index) {
+        if (!document.getElementById('imageReaderBGID')) {
+            return;
+        }
+
+        document.__vz.imageReader.currentImage = index;
+        if (document.__vz.imageReader.currentImage < 0) {
+            document.__vz.imageReader.currentImage = document.__vz.imageReader.images.length - 1;
+        }
+
+        if (document.__vz.imageReader.currentImage >= document.__vz.imageReader.images.length) {
+            document.__vz.imageReader.currentImage = 0;
+        }
+
+        document.getElementById('imageReaderContainerCurrentImage').remove();
+        document.getElementById('imageReaderContainerCurrentImageContainer').innerHTML = '<img id="imageReaderContainerCurrentImage" />';
+        document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
+
+        if (document.getElementById('imageReaderContainerCountID')) {
+            document.getElementById('imageReaderContainerCountID').innerHTML = (document.__vz.imageReader.currentImage + 1) + ' / ' + document.__vz.imageReader.images.length;
+        }
+    }
+
+    // Global function for open viewer
+    function openImageReaderViewer() {
+        if (document.getElementById('imageReaderBGID')) {
+            removeUI();
+            return;
+        }
+
+        prepareViewer();
+    };
+
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  View Image browser
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
+
     function prepareViewer() {
+
         reloadImages();
 
+        if (document.getElementById('imageReaderBGID')) {
+            return;
+        }
+
         if (document.__vz.imageReader.images.length <= 0) {
-            console.warn("ImageReader: can't read the images");
             alert("No images");
             return;
         }
 
         let htmlViewer = '\
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" /> \
-    <div style="width: 100vw; height: 100vh; position: fixed; background: black; opacity: 0.8; z-index: 9000; top: 0px; left: 0px;" id="imageReaderBGID"></div>\
-    <div style="width: 100vw; height: 100vh; position: fixed; z-index: 9001; top: 0px; left: 0px; display: table;" id="imageReaderContainerID">\
+    <div style="width: 100vw; height: 100vh; position: fixed; background: black; opacity: 0.8; z-index: 99998; top: 0px; left: 0px;" id="imageReaderBGID"></div>\
+    <div style="width: 100vw; height: 100vh; position: fixed; z-index: 99999; top: 0px; left: 0px; display: table;" id="imageReaderContainerID">\
         <div style="display: table-cell; vertical-align: middle; text-align: center;" id="imageReaderContainerCurrentImageContainer">\
             <img id="imageReaderContainerCurrentImage" />\
         </div>\
@@ -203,6 +260,7 @@
                 height: 50px; \
                 font-family: Arial,Helvetica Neue,Helvetica,sans-serif; \
                 font-size: 18px; \
+                box-shadow: none; \
             } \
             button.vz-button .material-icons { font-size: 48px; } \
             /* Bottom */ \
@@ -242,6 +300,7 @@
                 font-size: 10px; \
                 border-radius: 50%; \
                 margin-right: 10px; \
+                box-shadow: none; \
             } \
             /* Separator */ \
             span.vz-button-separator { \
@@ -260,7 +319,7 @@
         mainContainer.setAttribute("id", "imageReaderMainContainerID");
         mainContainer.innerHTML = htmlButtons + htmlViewer;
         document.body.appendChild(mainContainer);
-        showLoading();
+        checkLoading();
 
         document.__vz.imageReader.currentImage = 0;
         document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
@@ -272,133 +331,13 @@
         document.getElementById('imageReaderContainerBtnMoreID').addEventListener('click', moreImages);
     }
 
-    function removeUI() {
-        if (!document.getElementById('imageReaderBGID')) {
-            return;
-        }
-
-        if (document.getElementById('imageReaderContainerBtnCloseID')) {
-            document.getElementById('imageReaderContainerBtnCloseID').remove();
-        }
-
-        if (document.getElementById('imageReaderContainerBtnMoreID')) {
-            document.getElementById('imageReaderContainerBtnMoreID').remove();
-        }
-
-        document.getElementById('imageReaderBGID').remove();
-        document.getElementById('imageReaderContainerBtnNextID').remove();
-        document.getElementById('imageReaderContainerBtnPrevID').remove();
-        document.getElementById('imageReaderContainerID').remove();
-        document.getElementById('imageReaderMainContainerID').remove();
-
-        removeBrowserUI();
-    }
-
-    function removeBrowserUI() {
-        if (document.getElementById('imageReaderBrowserContainerID')) {
-            document.getElementById('imageReaderBrowserContainerID').remove();
-        }
-    }
-
-    function rightImage() {
-        goToImage(document.__vz.imageReader.currentImage + 1);
-    };
-
-    function leftImage() {
-        goToImage(document.__vz.imageReader.currentImage - 1);
-    };
-
-    function goToImage(index) {
-        if (!document.getElementById('imageReaderBGID')) {
-            return;
-        }
-
-        document.__vz.imageReader.currentImage = index;
-        if (document.__vz.imageReader.currentImage < 0) {
-            document.__vz.imageReader.currentImage = document.__vz.imageReader.images.length - 1;
-        }
-
-        if (document.__vz.imageReader.currentImage >= document.__vz.imageReader.images.length) {
-            document.__vz.imageReader.currentImage = 0;
-        }
-
-        document.getElementById('imageReaderContainerCurrentImage').remove();
-        document.getElementById('imageReaderContainerCurrentImageContainer').innerHTML = '<img id="imageReaderContainerCurrentImage" />';
-        document.getElementById('imageReaderContainerCurrentImage').src = document.__vz.imageReader.images[document.__vz.imageReader.currentImage].src;
-
-        if (document.getElementById('imageReaderContainerCountID')) {
-            document.getElementById('imageReaderContainerCountID').innerHTML = (document.__vz.imageReader.currentImage + 1) + ' / ' + document.__vz.imageReader.images.length;
-        }
-    }
-
-    function keyupEvents(evt) {
-        evt = evt || window.event;
-
-        // ESC
-        if (evt.keyCode === 27) {
-            removeUI();
-        }
-
-        // left
-        if (evt.keyCode === 37) {
-            leftImage();
-        }
-
-        // left
-        if (evt.keyCode === 39) {
-            rightImage();
-        }
-    }
-
-    function openImageReaderViewer() {
-        if (document.getElementById('imageReaderBGID')) {
-            removeUI();
-            return;
-        }
-
-        prepareViewer();
-    };
-
-    function setConfigImageReader(cnf) {
-        document.__vz.imageReader.cnf = cnf;
-    }
-
-    function getConfig(key) {
-        let lKeysAvailable = ["minWidthShow", "minHeightShow", "orderDefault", "orderDefaultDirection", "duplicates"];
-        let bExistKey = typeof key === typeof "string" &&
-            lKeysAvailable.indexOf(lKeysAvailable) >= 0 &&
-            typeof document.__vz !== typeof undefined &&
-            typeof document.__vz.imageReader !== typeof undefined &&
-            typeof document.__vz.imageReader.cnf !== typeof undefined &&
-            typeof document.__vz.imageReader.cnf[key] !== typeof undefined;
-
-        switch (key) {
-            case "minHeightShow":
-            case "minWidthShow":
-                if (!bExistKey) {
-                    return 32;
-                }
-
-                return parseInt(document.__vz.imageReader.cnf[key], 10);
-
-            case "orderDefault":
-                return document.__vz.imageReader.cnf[key] === "A01" ? "A01" : "A02";
-
-            case "orderDefaultDirection":
-                return document.__vz.imageReader.cnf[key] === "ASC" ? "ASC" : "DESC";
-
-            case "duplicates":
-                return parseInt(document.__vz.imageReader.cnf[key], 10) === 1 ? true : false;
-
-            default:
-                onError("The key doesn't exist");
-                console.error(key);
-                return null;
-        }
-
-        return null;
-    }
-
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  View Gallery
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
 
     function moreImages() {
 
@@ -466,22 +405,200 @@
 
     }
 
-    function showLoading() {
-        if (document.readyState === 'complete') {
-            let elements = document.getElementsByClassName('vz-loading-info');
-            for (let i = elements.length - 1; i >= 0; i--) {
-                elements[i].remove();
-            }
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  Close views
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
 
+    function removeUI() {
+        if (!document.getElementById('imageReaderBGID')) {
             return;
         }
 
-        if (!document.__vz.imageReader.loadingPage) {
-            let elements = document.getElementsByClassName('vz-loading-info');
-            for (let i = elements.length - 1; i >= 0; i--) {
-                elements[i].remove();
+        if (document.getElementById('imageReaderContainerBtnCloseID')) {
+            document.getElementById('imageReaderContainerBtnCloseID').remove();
+        }
+
+        if (document.getElementById('imageReaderContainerBtnMoreID')) {
+            document.getElementById('imageReaderContainerBtnMoreID').remove();
+        }
+
+        document.getElementById('imageReaderBGID').remove();
+        document.getElementById('imageReaderContainerBtnNextID').remove();
+        document.getElementById('imageReaderContainerBtnPrevID').remove();
+        document.getElementById('imageReaderContainerID').remove();
+        document.getElementById('imageReaderMainContainerID').remove();
+
+        removeBrowserUI();
+    }
+
+    function removeBrowserUI() {
+        if (document.getElementById('imageReaderBrowserContainerID')) {
+            document.getElementById('imageReaderBrowserContainerID').remove();
+        }
+    }
+
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  Background.js comunication
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
+
+    function onMessageListener(request) {
+
+        if (typeof request === typeof undefined) {
+            request = {
+                url: window.location.href,
+                action: 'none'
+            };
+        }
+
+        if (typeof request.url === typeof undefined) {
+            request.url = window.location.href;
+        }
+
+        if (typeof request.options !== typeof undefined) {
+            document.__vz.imageReader.setConfigImageReader(request.options);
+            document.__vz.imageReader.configLoaded = true;
+        }
+
+        switch (request.action) {
+            case "hide":
+                document.__vz.imageReader.hideImageReaderViewer();
+                break;
+
+            case "show":
+                document.__vz.imageReader.openImageReaderViewer();
+                break;
+
+            default:
+                reloadImages();
+                break;
+        }
+
+        return Promise.resolve({
+            response: "Hi"
+        });
+    }
+
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  Keyboard events
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
+
+    function keyupEvents(evt) {
+        evt = evt || window.event;
+
+        // ESC
+        if (evt.keyCode === 27) {
+            removeUI();
+        }
+
+        // left
+        if (evt.keyCode === 37) {
+            leftImage();
+        }
+
+        // left
+        if (evt.keyCode === 39) {
+            rightImage();
+        }
+    }
+
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  Auto actions
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
+
+    function checkLoading() {
+        if (document.readyState !== 'complete') {
+            return;
+        }
+
+        let elements = document.getElementsByClassName('vz-loading-info');
+        for (let i = elements.length - 1; i >= 0; i--) {
+            elements[i].remove();
+        }
+
+        // check if need auto-open
+        if (!document.__vz.imageReader.checkAutoOpen &&
+            document.__vz.imageReader.configLoaded) {
+
+            document.__vz.imageReader.checkAutoOpen = true;
+
+            let autoUris = getConfig('openAuto');
+            for (let i = 0; i < autoUris.length; i++) {
+                if (typeof autoUris[i] === typeof 'string' && autoUris[i] !== '') {
+                    let patt = new RegExp(autoUris[i]);
+                    let res = patt.test(window.location.href);
+                    if (res) {
+                        prepareViewer();
+                    }
+                }
             }
         }
+    }
+
+    //
+    //
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //  Config access functions
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
+
+    function setConfigImageReader(cnf) {
+        document.__vz.imageReader.cnf = cnf;
+    }
+
+    function getConfig(key) {
+        let lKeysAvailable = ["minWidthShow", "minHeightShow", "orderDefault", "orderDefaultDirection", "duplicates"];
+        let bExistKey = typeof key === typeof "string" &&
+            lKeysAvailable.indexOf(lKeysAvailable) >= 0 &&
+            typeof document.__vz !== typeof undefined &&
+            typeof document.__vz.imageReader !== typeof undefined &&
+            typeof document.__vz.imageReader.cnf !== typeof undefined &&
+            typeof document.__vz.imageReader.cnf[key] !== typeof undefined;
+
+        switch (key) {
+            case "minHeightShow":
+            case "minWidthShow":
+                if (!bExistKey) {
+                    return 32;
+                }
+
+                return parseInt(document.__vz.imageReader.cnf[key], 10);
+
+            case "orderDefault":
+                return document.__vz.imageReader.cnf[key] === "A01" ? "A01" : "A02";
+
+            case "orderDefaultDirection":
+                return document.__vz.imageReader.cnf[key] === "ASC" ? "ASC" : "DESC";
+
+            case "duplicates":
+                return parseInt(document.__vz.imageReader.cnf[key], 10) === 1 ? true : false;
+
+            case "openAuto":
+                return typeof document.__vz.imageReader.cnf[key] === typeof "string" ? document.__vz.imageReader.cnf[key].split('\n') : [];
+
+            default:
+                onError("The key doesn't exist");
+                console.error(key);
+                return null;
+        }
+
+        return null;
     }
 
 }());

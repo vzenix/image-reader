@@ -12,7 +12,8 @@ function saveOptions(e) {
             minHeightShow: document.querySelector("#minHeightShow").value,
             orderDefault: document.querySelector("#orderDefault").value,
             orderDefaultDirection: document.querySelector("#orderDefaultDirection").value,
-            duplicates: document.querySelector("#duplicates").value
+            duplicates: document.querySelector("#duplicates").value,
+            openAuto: document.querySelector("#openAuto").value
         });
     } else if (typeof chrome !== typeof undefined && typeof chrome.storage !== typeof undefined && typeof chrome.storage.local !== typeof undefined) {
         chrome.storage.local.set({
@@ -20,7 +21,8 @@ function saveOptions(e) {
             minHeightShow: document.querySelector("#minHeightShow").value,
             orderDefault: document.querySelector("#orderDefault").value,
             orderDefaultDirection: document.querySelector("#orderDefaultDirection").value,
-            duplicates: document.querySelector("#duplicates").value
+            duplicates: document.querySelector("#duplicates").value,
+            openAuto: document.querySelector("#openAuto").value
         }, () => {});
     }
 
@@ -51,6 +53,10 @@ function restoreOptions() {
         if (document.querySelector("#duplicates")) {
             document.querySelector("#duplicates").value = result.duplicates || 0;
         }
+
+        if (document.querySelector("#openAuto")) {
+            document.querySelector("#openAuto").value = result.openAuto || '(http|https):\\/\\/(sample.es)\\/(something)\\/(.*).jpg\n';
+        }
     }
 
     function onError(error) {
@@ -58,10 +64,10 @@ function restoreOptions() {
     }
 
     if (typeof browser !== typeof undefined && typeof browser.storage !== typeof undefined && typeof browser.storage.local !== typeof undefined) {
-        let getting = browser.storage.local.get(["minWidthShow", "minHeightShow", "orderDefault", "orderDefaultDirection", "duplicates"]);
+        let getting = browser.storage.local.get(["minWidthShow", "minHeightShow", "orderDefault", "orderDefaultDirection", "duplicates", "openAuto"]);
         getting.then(setCurrentChoice, onError);
     } else if (typeof chrome !== typeof undefined && typeof chrome.storage !== typeof undefined && typeof chrome.storage.local !== typeof undefined) {
-        chrome.storage.local.get(["minWidthShow", "minHeightShow", "orderDefault", "orderDefaultDirection", "duplicates"], setCurrentChoice);
+        chrome.storage.local.get(["minWidthShow", "minHeightShow", "orderDefault", "orderDefaultDirection", "duplicates", "openAuto"], setCurrentChoice);
     } else {
         onError("Can't find 'chrome.storage.local' or 'browser.storage.local'");
         return;
