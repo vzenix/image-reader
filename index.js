@@ -195,8 +195,12 @@
             return;
         }
 
+        let closeImageBtn = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAQAAAD9CzEMAAAAwklEQVR4Ae2WAQbDQBBFB8ndAgL2kCW0VPRsiV19xRwg36eL2HeA/9idmZkYDAb3hYmNEiIUNqbQYWYHGkWMb8DOrAveJI01LmClkTx1wcJJUlkv4ivJyRLhK/R4X6HH64pKUln8ePmFZbmvkJ/PV1jxaqWnwowXejU5OIUm9BWJMEYsxdeP1wRNFvR/Ir2ODg7/k6VO0Mu0f6P1HxX+sOs/rnstnA4r01j6zVDw0puJYpwt1uH1Yf7n6fhgitsyGAx+v01bGP41zTEAAAAASUVORK5CYII=';
+        let appsImageBtn = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwAQAAAAB/ecQqAAAAAnRSTlMAAHaTzTgAAAAWSURBVHgBYyAb/Of/8J9kaoibSRgAAApFR7lF7fQlAAAAAElFTkSuQmCC';
+        let arrowBackBtn = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAe0lEQVR4Ae2ZAQaAQBAA7xsBBPe3HOAAvSP0wrhHTEgEEe6wmnnBDIBJItIPYAHmqPKFiwOYo8rziMhR5W8aMEWVB9jTOJSvyiuvvPLKK6+88sor3yVg5Z0tRQCo/4owwggjjDDCCCOMMKIY4eAYF9GAHHnyZTfrJ0TkBClecT0ltHfUAAAAAElFTkSuQmCC';
+        let arrowNextBtn = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAcklEQVR4Ae3PsRVAQBQFUTkdUKZAZjNtUskI/ViwvHNmKpg7mNn7gB1oqfMrTy12viLi5uMQwAhclBIRswgRIkSIECFChAgRInoDFuD8C8B55513vn/OO++88847P6XOV8SWOl8Re+p8RRyx8xXx7byZ3Z/JYly7B/D+AAAAAElFTkSuQmCC';
+
         let htmlViewer = '\
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" /> \
     <div style="width: 100vw; height: 100vh; position: fixed; background: black; opacity: 0.8; z-index: 99998; top: 0px; left: 0px;" id="imageReaderBGID"></div>\
     <div style="width: 100vw; height: 100vh; position: fixed; z-index: 99999; top: 0px; left: 0px; display: table;" id="imageReaderContainerID">\
         <div style="display: table-cell; vertical-align: middle; text-align: center;" id="imageReaderContainerCurrentImageContainer">\
@@ -205,11 +209,12 @@
     </div> \
     ';
 
+        // <i class="material-icons"> close </i>
         let htmlButtons = '\
         <div class="vz-button-container">\
             <span class="vz-button-separator"></span>\
             <button id="imageReaderContainerBtnCloseID" class="vz-button">\
-                <i class="material-icons"> close </i> \
+                <img src="' + closeImageBtn + '" /> \
             </button> \
         </div> \
         <div class="vz-bottom-container"> \
@@ -218,13 +223,13 @@
             <span id="imageReaderContainerCountID"> 1 / ' + document.__vz.imageReader.images.length + ' </span> \
             <span class="vz-button-separator"></span> \
             <button id="imageReaderContainerBtnPrevID" class="vz-button-secundary" style="margin-right: 0;">\
-                <i class="material-icons"> arrow_back_ios </i> \
+                <img src="' + arrowBackBtn + '" /> \
             </button> \
             <button id="imageReaderContainerBtnMoreID" class="vz-button-secundary">\
-                <i class="material-icons"> apps </i> \
+                <img src="' + appsImageBtn + '" /> \
             </button> \
             <button id="imageReaderContainerBtnNextID" class="vz-button-secundary" style="margin-right: 25px;">\
-                <i class="material-icons"> arrow_forward_ios </i> \
+                <img src="' + arrowNextBtn + '" /> \
             </button> \
         </div>\
         <style type="text/css">\

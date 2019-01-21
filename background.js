@@ -113,18 +113,22 @@ function sendMessageToWebpage(item, tabId, action, changeInfo, tab) {
     }
 
     if (typeof chrome !== typeof undefined && typeof chrome.tabs !== typeof undefined) {
-        chrome.tabs
-            .sendMessage(
-                tabId, {
-                    // url: changeInfo.url,
-                    action: action,
-                    options: iOptToSend
-                });
+        try {
+            chrome.tabs
+                .sendMessage(
+                    tabId, {
+                        // url: changeInfo.url,
+                        action: action,
+                        options: iOptToSend
+                    }, (r) => console.log(r));
+        } catch (ex) {
+
+        }
 
         return;
     }
 
-    console.warn('Can\'t find "chrome.tabs.sendMessage" or "browser.tabs.sendMessage"');
+    console.warn('Can\'t find "chrome.tabs.sendMessage" or "browser.tabs.sendMessage" or tabId', tabId);
 }
 
 function onError(error) {
